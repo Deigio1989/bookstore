@@ -11,48 +11,48 @@ from order.models import Order
 from product.models import Product
 #
 
-class TestOrderViewSet(APITestCase):
-
-    client= APIClient()
+class TestProductViewSet(APITestCase):
+    client = APIClient()
 
     def setUp(self):
-        self.user = UserFactory()
-
-        self.product = ProductFactory(
-            title='pro controller', price=200.00, 
-            )
-        
+        self.category = CategoryFactory(title='technology')
+        self.product = ProductFactory(title='mouse', price=100, category=[self.category], active=True)
 
     def test_get_all_products(self):
         response = self.client.get(
             reverse('product-list', kwargs={'version': 'v1'})
         )
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        product_data =json.loads(response.content)
 
+        product_data = json.loads(response.content)
         self.assertEqual(product_data[0]['title'], self.product.title)
         self.assertEqual(product_data[0]['price'], self.product.price)
         self.assertEqual(product_data[0]['active'], self.product.active)
-        
+
+        category_data = product_data[0]['category']
+        self.assertIsInstance(category_data, list)
+        self.assertEqual(category_data[0]['title'], self.category.title)
+
 
     def test_create_product(self):
         category = CategoryFactory()
         data = json.dumps({
             'title': 'notebook',
             'price': 800.00,
-            'categories_id': [category.id]      
+            'categories_id': [category.id]  # Certifique-se de que a chave é a mesma usada no serializador
         })
 
         response = self.client.post(
-            reverse('product-list', kwargs = {'version': 'v1'}),
+            reverse('product-list', kwargs={'version': 'v1'}),
             data=data,
             content_type='application/json'
         )
+        if response.status_code != status.HTTP_201_CREATED:
+            print(response.content)  # Adicionando depuração para ver a mensagem de erro
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        created_product = Product.objects.get(title = 'notebook')
-
+        created_product = Product.objects.get(title='notebook')
         self.assertEqual(created_product.title, 'notebook')
         self.assertEqual(created_product.price, 800.00)
+        self.assertIn(category, created_product.category.all())
