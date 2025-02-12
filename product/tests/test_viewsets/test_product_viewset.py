@@ -24,14 +24,16 @@ class TestProductViewSet(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        product_data = json.loads(response.content)
-        self.assertEqual(product_data[0]['title'], self.product.title)
-        self.assertEqual(product_data[0]['price'], self.product.price)
-        self.assertEqual(product_data[0]['active'], self.product.active)
+        data = json.loads(response.content)
+        product_data = data['results'][0]  # Acessar a chave 'results' da paginação
+        self.assertEqual(product_data['title'], self.product.title)
+        self.assertEqual(product_data['price'], self.product.price)
+        self.assertEqual(product_data['active'], self.product.active)
 
-        category_data = product_data[0]['category']
+        category_data = product_data['category']
         self.assertIsInstance(category_data, list)
         self.assertEqual(category_data[0]['title'], self.category.title)
+
 
 
     def test_create_product(self):

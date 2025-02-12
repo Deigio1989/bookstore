@@ -21,9 +21,10 @@ class CategoryViewSet(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        category_data = json.loads(response.content)
+        data = json.loads(response.content)
+        category_data = data['results'][0]  # Acessar a chave 'results' da paginação
+        self.assertEqual(category_data['title'], self.category.title)
 
-        self.assertEqual(category_data[0]['title'], self.category.title)
 
 
     def test_create_category(self):

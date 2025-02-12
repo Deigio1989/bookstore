@@ -26,7 +26,8 @@ class TestOrderViewSet(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        order_data = json.loads(response.content)[0]
+        data = json.loads(response.content)
+        order_data = data['results'][0]  # Acessar a chave 'results' da paginação
         self.assertEqual(order_data['product'][0]['title'], self.product.title)
         self.assertEqual(order_data['product'][0]['price'], self.product.price)
         self.assertEqual(order_data['product'][0]['active'], self.product.active)
