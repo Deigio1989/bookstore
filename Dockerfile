@@ -17,18 +17,15 @@ ENV PYTHONUNBUFFERED=1 \
 # Adicionar Poetry e o virtualenv ao PATH
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
-# Instalar dependências necessárias
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
+# Instalar dependências necessárias e o Poetry
+RUN apt-get update && apt-get install --no-install-recommends -y \
         curl \
-        build-essential
-
-# Instalar o Poetry especificando a versão
-RUN curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION
-
-# Instalar dependências do PostgreSQL
-RUN apt-get update \
-    && apt-get -y install libpq-dev gcc \
+        build-essential \
+        libpq-dev \
+        gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION \
     && pip install psycopg2
 
 # Copiar arquivos de configuração do Poetry
@@ -40,7 +37,7 @@ COPY README.md ./
 RUN ls -la $PYSETUP_PATH
 
 # Instalar dependências do projeto usando o Poetry
-RUN poetry install  
+RUN poetry install --no-root -vvv
 
 WORKDIR /app
 
