@@ -35,6 +35,7 @@ jobs:
       - name: Test
         env:
           DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]" # Adiciona a variável de ambiente aqui
+          SECRET_KEY: "your_secret_key" # Adiciona a variável de ambiente SECRET_KEY
         run: poetry run python manage.py test
 
       - name: Wemake Python Stylguide
