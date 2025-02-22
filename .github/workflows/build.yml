@@ -11,6 +11,16 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: bookstore
+          POSTGRES_USER: yourusername
+          POSTGRES_PASSWORD: yourpassword
+
     steps:
       - uses: actions/checkout@v2
 
@@ -32,7 +42,11 @@ jobs:
         shell: bash
         run: python -m poetry install
 
-      - name: Test
+      - name: Apply migrations
+        run: |
+          poetry run python manage.py migrate
+
+      - name: Run tests
         env:
           DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]" # Adiciona a variável de ambiente aqui
         run: |
