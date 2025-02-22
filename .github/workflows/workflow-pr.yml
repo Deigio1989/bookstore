@@ -1,15 +1,19 @@
 name: Python Pull Request Workflow
+
 on: [pull_request]
+
 jobs:
   qa:
     name: Quality check
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
+
       - name: Set up Python
-        uses: actions/setup-python@master
+        uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.12 # Ajuste para a versão necessária do Python
+
       - name: Install poetry
         run: |
           pip install -U pip
@@ -25,9 +29,14 @@ jobs:
         shell: bash
         run: python -m poetry install
 
+      - name: Apply migrations
+        run: poetry run python manage.py migrate
+
       - name: Test
-        run: |
-          poetry run python manage.py test
+        env:
+          DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]" # Adiciona a variável de ambiente aqui
+        run: poetry run python manage.py test
+
       - name: Wemake Python Stylguide
         uses: wemake-services/wemake-python-styleguide@0.16.0
         continue-on-error: true
