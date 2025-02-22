@@ -1,39 +1,26 @@
-name: Python application
+name: Python Pull Request Workflow
 
-on: [push]
+on: [pull_request]
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.8, 3.9]
-
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: bookstore
-          POSTGRES_USER: yourusername
-          POSTGRES_PASSWORD: yourpassword
-
+  qa:
+    name: Quality check
+    runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.12 # Ajuste para a versão necessária do Python
 
       - name: Install poetry
         run: |
-          python -m ensurepip
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade poetry
+          pip install -U pip
+          pip install poetry
+          poetry install
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
 
       - name: View poetry --help
         run: poetry --help
@@ -43,11 +30,18 @@ jobs:
         run: python -m poetry install
 
       - name: Apply migrations
-        run: |
-          poetry run python manage.py migrate
+        run: poetry run python manage.py migrate
 
-      - name: Run tests
+      - name: Test
         env:
           DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]" # Adiciona a variável de ambiente aqui
-        run: |
-          poetry run python manage.py test
+          SECRET_KEY: "your_secret_key" # Adiciona a variável de ambiente SECRET_KEY
+        run: poetry run python manage.py test
+
+      - name: Wemake Python Stylguide
+        uses: wemake-services/wemake-python-styleguide@0.16.0
+        continue-on-error: true
+        with:
+          reporter: "github-pr-review"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
