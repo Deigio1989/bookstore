@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION \
-    && pip install psycopg2
+    && pip install  --no-cache-dir psycopg2
 
 # Copiar arquivos de configuração do Poetry
 WORKDIR $PYSETUP_PATH
