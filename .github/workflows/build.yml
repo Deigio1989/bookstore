@@ -42,6 +42,9 @@ jobs:
         shell: bash
         run: python -m poetry install
 
+      - name: Install psycopg2
+        run: poetry add psycopg2
+
       - name: Run script to delete test database if exists
         run: python delete_test_db.py
 
