@@ -35,18 +35,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade poetry
 
-      - name: View poetry --help
-        run: poetry --help
-
       - name: Install dependencies
         shell: bash
-        run: python -m poetry install
+        run: poetry install
 
-      - name: Install psycopg2
-        run: poetry add psycopg2
+      - name: Verify installed packages
+        run: poetry show
 
       - name: Run script to delete test database if exists
-        run: python delete_test_db.py
+        run: poetry run python delete_test_db.py
 
       - name: Apply migrations
         run: poetry run python manage.py migrate
