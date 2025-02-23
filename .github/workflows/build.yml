@@ -42,12 +42,13 @@ jobs:
         shell: bash
         run: python -m poetry install
 
+      - name: Run script to delete test database if exists
+        run: python delete_test_db.py
+
       - name: Apply migrations
-        run: |
-          poetry run python manage.py migrate
+        run: poetry run python manage.py migrate
 
       - name: Run tests
         env:
           DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]" # Adiciona a variável de ambiente aqui
-        run: |
-          poetry run python manage.py test
+        run: poetry run python manage.py test

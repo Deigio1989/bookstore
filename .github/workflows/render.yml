@@ -1,0 +1,24 @@
+name: Push Container to Render
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  render-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Install Render CLI
+        run: |
+          curl -fsSL https://cli.render.com/install | bash
+
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render login --api-key $RENDER_API_KEY
+          render deploy --service-id ${{ secrets.RENDER_SERVICE_ID }}
