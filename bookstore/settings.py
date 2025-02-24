@@ -25,6 +25,8 @@ DATABASES = {
     )
 }
 
+DATABASES["default"] = dj_database_url.parse("postgresql://admin:qTFCTSU6ZIIydeLWML4ZAhjMQPQUT33c@dpg-cuton8i3esus73ebv2bg-a.oregon-postgres.render.com/bookstore_ebac_sql")
+
 
 # Application definition
 
